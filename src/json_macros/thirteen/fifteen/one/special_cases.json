@@ -36,7 +36,16 @@
   ],
   "special_cases": {
     "Cassiopeia": {
-      "movespeedperlevel": 4
+      "movespeedperlevel": 4,
+      "bonus": {
+        "movespeed": 4
+      }
+    },
+    "Akshan": {
+      "attackspeedratio": 0.400,
+      "bonus": {
+
+      }
     }
   }
 }

@@ -1,4 +1,4 @@
-use crate::champion::champion::ChampDir;
+use crate::champion::champdir::ChampDir;
 use approx::assert_relative_eq;
 
 mod champion;
