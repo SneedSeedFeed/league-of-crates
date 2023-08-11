@@ -1,0 +1,42 @@
+{
+  "special_case_champs": [
+    "Cassiopeia",
+    "Akshan",
+    "Senna",
+    "Caitlyn",
+    "Nautilus",
+    "Amumu",
+    "Malphite",
+    "Zac",
+    "Shen",
+    "Maokai",
+    "Ekko",
+    "Naafiri",
+    "Qiyana",
+    "Sejuani",
+    "Gragas",
+    "DrMundo",
+    "Lux",
+    "Seraphine",
+    "Vex",
+    "Lissandra",
+    "Rammus",
+    "Zeri",
+    "MonkeyKing",
+    "Nilah",
+    "Yasuo",
+    "Graves",
+    "Gangplank",
+    "Kayle",
+    "Neeko",
+    "Blitzcrank",
+    "Kennen",
+    "Azir",
+    "Volibear"
+  ],
+  "special_cases": {
+    "Cassiopeia": {
+      "movespeedperlevel": 4
+    }
+  }
+}

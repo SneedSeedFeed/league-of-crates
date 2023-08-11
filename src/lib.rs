@@ -1,18 +1,19 @@
 use crate::champion::champion::ChampDir;
-use std::path::Path;
 use approx::assert_relative_eq;
 
 mod champion;
+mod json_macros;
+use crate::json_macros::thirteen_fifteen_one::champions_json;
 
 macro_rules! new_dir {
     () => {
-        ChampDir::new(Path::new("champion.json")).unwrap()
-    }
+        ChampDir::new_from_value(champions_json! {}).unwrap()
+    };
 }
 macro_rules! new_dir_wrapped {
     () => {
-        ChampDir::new(Path::new("champion.json"))
-    }
+        ChampDir::new_from_value(champions_json! {})
+    };
 }
 
 #[cfg(test)]
@@ -22,7 +23,7 @@ mod tests {
     #[test]
     fn it_works() {
         let champ_dir = new_dir_wrapped!();
-        assert!(champ_dir.is_ok())
+        assert!(champ_dir.is_ok());
     }
 
     #[test]
@@ -32,7 +33,7 @@ mod tests {
     }
 
     #[test]
-    fn get_key_ok(){
+    fn get_key_ok() {
         let champ_dir = new_dir!();
         let champ = champ_dir.get_by_key(516);
         assert!(champ.is_some());
@@ -41,7 +42,7 @@ mod tests {
     }
 
     #[test]
-    fn get_name_ok(){
+    fn get_name_ok() {
         let champ_dir = new_dir!();
         let champ = champ_dir.get_by_name("Ornn");
         assert!(champ.is_some());
@@ -52,22 +53,34 @@ mod tests {
     #[test]
     fn calcs_ok() {
         let champ_dir = new_dir!();
-        let calc =champ_dir.get_by_key(103).unwrap().get_stats_level(18).unwrap();
+        let calc = champ_dir
+            .get_by_key(103)
+            .unwrap()
+            .get_stats_level(18)
+            .unwrap();
 
         //Compare Ahri stats we calc vs ones from the wiki
         assert_relative_eq!(calc.hp, 2222f32);
-        assert_relative_eq!(calc.hpregen,12.7f32);
+        assert_relative_eq!(calc.hpregen, 12.7f32);
         assert_relative_eq!(calc.mp, 843f32);
-        assert_relative_eq!(calc.mpregen,21.6f32);
-        assert_relative_eq!(calc.attackdamage,104f32);
+        assert_relative_eq!(calc.mpregen, 21.6f32);
+        assert_relative_eq!(calc.attackdamage, 104f32);
 
         // As long as we are correct to 3 decimal places IDGAF
-        assert_relative_eq!(calc.attackspeed,0.895f32, max_relative=0.0005);
+        assert_relative_eq!(calc.attackspeed, 0.895f32, max_relative = 0.0005);
 
-        assert_relative_eq!(calc.armor,100.9f32);
-        assert_relative_eq!(calc.spellblock,52.1f32);
-        assert_relative_eq!(calc.attackrange,550f32);
-        assert_relative_eq!(calc.movespeed,330f32);
+        assert_relative_eq!(calc.armor, 100.9f32);
+        assert_relative_eq!(calc.spellblock, 52.1f32);
+        assert_relative_eq!(calc.attackrange, 550f32);
+        assert_relative_eq!(calc.movespeed, 330f32);
 
+        let senna = champ_dir
+            .get_by_name("Senna")
+            .unwrap()
+            .get_stats_level(18)
+            .unwrap();
+
+        //Change to max relative 0.0005 when done
+        assert_relative_eq!(calc.attackspeed, 0.897f32, max_relative = 0.005)
     }
 }
