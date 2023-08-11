@@ -35,6 +35,7 @@ pub struct ChampStats {
     pub attackspeedperlevel: f32,
     pub attackspeed: f32,
     pub attackspeedratio: f32,
+    pub attackspeedbonusat1: f32,
 }
 
 pub struct LevelStats {

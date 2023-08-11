@@ -7,12 +7,12 @@ use crate::json_macros::thirteen_fifteen_one::champions_json;
 
 macro_rules! new_dir {
     () => {
-        ChampDir::new_from_value(champions_json! {}).unwrap()
+        ChampDir::new_from_value(champions_json!()).unwrap()
     };
 }
 macro_rules! new_dir_wrapped {
     () => {
-        ChampDir::new_from_value(champions_json! {})
+        ChampDir::new_from_value(champions_json!())
     };
 }
 
@@ -80,7 +80,6 @@ mod tests {
             .get_stats_level(18)
             .unwrap();
 
-        //Change to max relative 0.0005 when done
-        assert_relative_eq!(calc.attackspeed, 0.897f32, max_relative = 0.005)
+        assert_relative_eq!(senna.attackspeed, 0.897f32, max_relative = 0.0005)
     }
 }
