@@ -1,5 +1,4 @@
 use crate::champion::champstats::ChampStatError::{LevelRangeError, ZeroError};
-use crate::champion::specialcases::Stats::attackspeedbonusat1;
 
 #[derive(Debug)]
 pub enum ChampStatError {

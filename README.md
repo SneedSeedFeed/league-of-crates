@@ -15,3 +15,15 @@ Output: Ornn
 ```
 
 I will probably maybe potentially add proper docs in the future but while it's so shrimple I think I can get away with just some example code. As everything comes from .json I tried to pass as many of the potential errors back as possible instead of risking a panic so watch out for that I guess.
+
+## Changelog
+- 0.2.0
+  - Pain and suffering
+  - Can create champ dir from a json value
+  - Added macros that output the 13.15.1 champions.json as a value
+  - Added the "adjustments/specialcases/corrections/i need to fix all this code it's an ugly bodge" json to fix Riot's lack of information on attack speed ratios
+  - Didn't actually fully finish the corrections json so some champs attack speed will be off
+  - Fixed the attack speed calculation
+
+- 0.1.1 - Added readme
+- 0.1.0 - Initial release
