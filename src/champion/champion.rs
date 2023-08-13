@@ -1,3 +1,4 @@
+use crate::champion::champdir::RawChampion;
 use crate::champion::champstats::{ChampStatError, ChampStats, EffectiveHealth, LevelStats};
 use serde::Deserialize;
 

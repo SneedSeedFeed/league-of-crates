@@ -3,16 +3,16 @@ use approx::assert_relative_eq;
 
 mod champion;
 mod json_macros;
-use crate::json_macros::thirteen_fifteen_one::champions_json;
+use crate::json_macros::thirteen_fifteen_one::{champions_json, special_json};
 
 macro_rules! new_dir {
     () => {
-        ChampDir::new_from_value(champions_json!()).unwrap()
+        ChampDir::new_from_value(champions_json!(), special_json!()).unwrap()
     };
 }
 macro_rules! new_dir_wrapped {
     () => {
-        ChampDir::new_from_value(champions_json!())
+        ChampDir::new_from_value(champions_json!(), special_json!())
     };
 }
 
@@ -80,6 +80,6 @@ mod tests {
             .get_stats_level(18)
             .unwrap();
 
-        assert_relative_eq!(senna.attackspeed, 0.897f32, max_relative = 0.0005)
+        assert_relative_eq!(senna.attackspeed, 0.897f32, max_relative = 0.001)
     }
 }

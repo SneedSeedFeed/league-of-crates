@@ -1,4 +1,5 @@
 use crate::champion::champstats::ChampStatError::{LevelRangeError, ZeroError};
+use crate::champion::specialcases::Stats::attackspeedbonusat1;
 
 #[derive(Debug)]
 pub enum ChampStatError {
@@ -69,8 +70,7 @@ impl ChampStats {
             mpregen: self.mpregen + self.mpregenperlevel * (level - 1) as f32,
             crit: self.crit + self.critperlevel * (level - 1) as f32,
             attackdamage: self.attackdamage + self.attackdamageperlevel * (level - 1) as f32,
-            attackspeed: self.attackspeed
-                * (1f32 + (self.attackspeedperlevel * (level - 1) as f32) / 100f32),
+            attackspeed: self.attackspeedratio + self.attackspeedratio*(((level-1) as f32*self.attackspeedperlevel+self.attackspeedbonusat1)/100f32)
         })
     }
 

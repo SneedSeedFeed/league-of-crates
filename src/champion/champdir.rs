@@ -1,8 +1,8 @@
-use crate::champion::champdir::ChampCreationError::{FileError, ParseError};
+use crate::champion::champdir::ChampCreationError::{FileError, ParseError, SpecialDataError};
 use crate::champion::champion::{ChampInfo, Champion};
 use crate::champion::champstats::ChampStats;
-use crate::champion::specialcases::SpecialCases;
 use crate::champion::specialcases::SpecialCaseError;
+use crate::champion::specialcases::{Bonus, ChampAdjustment, SpecialCases, Stats};
 use serde::Deserialize;
 use serde_json::{from_value, Map, Value};
 use std::fs;
@@ -30,6 +30,33 @@ pub struct RawChampStats {
     pub attackdamageperlevel: f32,
     pub attackspeedperlevel: f32,
     pub attackspeed: f32,
+}
+
+impl RawChampStats {
+    fn adjust(self, adjustments: &ChampAdjustment) -> ChampStats {
+        let mut stats: ChampStats = self.into();
+
+        if adjustments.bonus.is_some() {
+            for bonus in adjustments.bonus.as_ref().unwrap() {
+                match bonus {
+                    Bonus::movespeed(x) => stats.movespeed += x,
+                }
+            }
+        }
+
+        if adjustments.stats.is_some() {
+            for stat in adjustments.stats.as_ref().unwrap() {
+                match stat {
+                    Stats::movespeedperlevel(x) => stats.movespeedperlevel = *x,
+                    Stats::attackrangeperlevel(x) => stats.attackrangeperlevel = *x,
+                    Stats::attackspeedratio(x) => stats.attackspeedratio = *x,
+                    Stats::attackspeedbonusat1(x) => stats.attackspeedbonusat1 = *x,
+                }
+            }
+        }
+
+        stats
+    }
 }
 
 impl Into<ChampStats> for RawChampStats {
@@ -64,7 +91,7 @@ impl Into<ChampStats> for RawChampStats {
 }
 
 #[derive(Deserialize)]
-struct RawChampion {
+pub struct RawChampion {
     id: String,
     key: String,
     name: String,
@@ -74,6 +101,23 @@ struct RawChampion {
     tags: Vec<String>,
     partype: String,
     stats: RawChampStats,
+}
+
+impl RawChampion {
+    fn adjust(self, adjustments: &ChampAdjustment) -> Champion {
+        Champion {
+            id: self.id,
+            // This panics, cry about it
+            key: self.key.parse().unwrap(),
+            name: self.name,
+            title: self.title,
+            blurb: self.blurb,
+            info: self.info,
+            tags: self.tags,
+            partype: self.partype,
+            stats: self.stats.adjust(adjustments),
+        }
+    }
 }
 
 impl Into<Champion> for RawChampion {
@@ -101,7 +145,7 @@ pub struct ChampDir {
 pub enum ChampCreationError {
     FileError,
     ParseError(Option<serde_json::Error>),
-    SpecialDataError(String)
+    SpecialDataError(String),
 }
 
 impl ChampDir {
@@ -110,22 +154,26 @@ impl ChampDir {
         let json: Value = serde_json::from_str(&data).map_err(|err| ParseError(Some(err)))?;
 
         let special_case_data = fs::read_to_string(special_case_file).map_err(|_| FileError)?;
-        let special_case_json: Value = serde_json::from_str(&special_case_data).map_err(|err| ParseError(Some(err)))?;
+        let special_case_json: Value =
+            serde_json::from_str(&special_case_data).map_err(|err| ParseError(Some(err)))?;
 
-        ChampDir::new_from_value(json,special_case_json)
+        ChampDir::new_from_value(json, special_case_json)
     }
 
-    pub fn new_from_value(champ_json: Value, special_case_json:Value) -> Result<Self, ChampCreationError> {
-        let corrections = SpecialCases::new_from_value(special_case_json).map_err(|x| match x{
+    pub fn new_from_value(
+        champ_json: Value,
+        special_case_json: Value,
+    ) -> Result<Self, ChampCreationError> {
+        let corrections = SpecialCases::new_from_value(special_case_json).map_err(|x| match x {
             SpecialCaseError::FileError => FileError,
-            SpecialCaseError::ParseError(err) => ParseError(err)
+            SpecialCaseError::ParseError(err) => ParseError(err),
         })?;
-
 
         return match &champ_json["data"] {
             Value::Object(x) => {
-                let x = ChampDir::parse_champs(x)?;
-                Ok(ChampDir { champions: ChampDir::process_and_correct(x, corrections)? })
+                Ok(ChampDir {
+                    champions: ChampDir::process_and_correct(ChampDir::parse_champs(x)?, corrections)?,
+                })
             }
             _ => Err(ParseError(None)),
         };
@@ -148,11 +196,43 @@ impl ChampDir {
     }
 
     fn parse_champ(champ: &Value) -> Result<RawChampion, ChampCreationError> {
-        Ok(from_value::<RawChampion>(champ.clone())
-            .map_err(|err| ParseError(Some(err)))?)
+        Ok(from_value::<RawChampion>(champ.clone()).map_err(|err| ParseError(Some(err)))?)
     }
 
-    fn process_and_correct(raw_champs: Vec<RawChampion>, corrections:SpecialCases) -> Result<Vec<Champion>, ChampCreationError>{
-        todo!()
+    fn process_and_correct(
+        raw_champs: Vec<RawChampion>,
+        corrections: SpecialCases,
+    ) -> Result<Vec<Champion>, ChampCreationError> {
+        //Check if any of the listed champs that need adjustments either don't have any listed adjustments or aren't in the champ directory
+        if !ChampDir::verify(&raw_champs, &corrections) {
+            return Err(SpecialDataError("Error in verification".into()))
+        }
+
+
+        let mut test: Vec<Champion> = Vec::new();
+
+        for champ in raw_champs{
+            let adjustment = corrections.adjustments.get(champ.id.as_str());
+            if adjustment.is_none(){
+                test.push(champ.into())
+            } else {
+                test.push(champ.adjust(adjustment.unwrap()))
+            }
+        }
+
+
+
+        Ok(test)
+    }
+
+    fn verify(raw_champs: &Vec<RawChampion>, corrections: &SpecialCases) -> bool {
+        for champ in &corrections.special_case_champs {
+            if corrections.adjustments.get(champ.as_str()).is_none()
+                || raw_champs.iter().find(|x| x.id == *champ).is_none()
+            {
+                return false;
+            }
+        }
+        true
     }
 }

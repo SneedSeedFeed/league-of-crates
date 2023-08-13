@@ -32,20 +32,75 @@
     "Blitzcrank",
     "Kennen",
     "Azir",
-    "Volibear"
+    "Volibear",
+    "Jhin"
   ],
   "special_cases": {
     "Cassiopeia": {
-      "movespeedperlevel": 4,
+      "stats": {
+        "attackspeedratio": 0.400
+      },
       "bonus": {
         "movespeed": 4
       }
     },
     "Akshan": {
-      "attackspeedratio": 0.400,
-      "bonus": {
-
+      "stats": {
+        "attackspeedratio": 0.400,
+        "attackspeedbonusat1": 60
       }
-    }
+    },
+    "Senna": {
+      "stats": {
+        "attackspeedratio": 0.400,
+        "attackspeedbonusat1": 56
+      }
+    },
+    "Caitlyn": {
+      "stats": {
+        "attackspeedratio": 0.568,
+        "attackspeedbonusat1": 20
+      }
+    },
+    "Nautilus": {
+      "stats": {
+        "attackspeedratio": 0.612,
+        "attackspeedbonusat1": 15
+      }
+    },
+    "Amumu": {
+      "stats": {
+        "attackspeedratio": 0.638,
+        "attackspeedbonusat1": 15
+      }
+    },
+    "Malphite": {},
+    "Zac": {},
+    "Shen": {},
+    "Maokai": {},
+    "Ekko": {},
+    "Naafiri": {},
+    "Qiyana": {},
+    "Sejuani": {},
+    "Gragas": {},
+    "DrMundo": {},
+    "Lux": {},
+    "Seraphine": {},
+    "Vex": {},
+    "Lissandra": {},
+    "Rammus": {},
+    "Zeri": {},
+    "MonkeyKing": {},
+    "Nilah": {},
+    "Yasuo": {},
+    "Graves": {},
+    "Gangplank": {},
+    "Kayle": {},
+    "Neeko": {},
+    "Blitzcrank": {},
+    "Kennen": {},
+    "Azir": {},
+    "Volibear": {},
+    "Jhin": {}
   }
 }
