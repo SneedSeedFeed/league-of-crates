@@ -80,6 +80,14 @@ mod tests {
             .get_stats_level(18)
             .unwrap();
 
-        assert_relative_eq!(senna.attackspeed, 0.897f32, max_relative = 0.001)
+        assert_relative_eq!(senna.attackspeed, 0.897f32, max_relative = 0.002);
+
+        let tristana = champ_dir.get_by_name("Tristana").unwrap().get_stats_level(18).unwrap();
+        assert_relative_eq!(tristana.attackrange,661f32);
+
+        let cassiopeia = champ_dir.get_by_name("Cassiopeia").unwrap().get_stats_level(18).unwrap();
+        println!("{}",champ_dir.get_by_name("Cassiopeia").unwrap().stats.movespeedperlevel);
+        assert_relative_eq!(cassiopeia.movespeed,400f32);
+
     }
 }

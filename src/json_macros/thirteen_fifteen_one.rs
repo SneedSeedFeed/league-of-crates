@@ -41,12 +41,14 @@ macro_rules! special_json {
     "Kennen",
     "Azir",
     "Volibear",
-    "Jhin"
+    "Jhin",
+    "Tristana"
   ],
   "special_cases": {
     "Cassiopeia": {
       "stats": {
-        "attackspeedratio": 0.400
+        "attackspeedratio": 0.400,
+        "movespeedperlevel": 4
       },
       "bonus": {
         "movespeed": 4
@@ -109,7 +111,12 @@ macro_rules! special_json {
     "Kennen": {},
     "Azir": {},
     "Volibear": {},
-    "Jhin": {}
+    "Jhin": {},
+    "Tristana": {
+      "stats": {
+        "attackrangeperlevel": 8
+      }
+    }
   }
 }"#,
         )

@@ -20,10 +20,11 @@ I will probably maybe potentially add proper docs in the future but while it's s
 - 0.2.0
   - Pain and suffering
   - Can create champ dir from a json value
-  - Added macros that output the 13.15.1 champions.json as a value
-  - Added the "adjustments/specialcases/corrections/i need to fix all this code it's an ugly bodge" json to fix Riot's lack of information on attack speed ratios
+  - Added macros that output the 13.15.1 champions.json as a value. Use champion_json!() and special_json!()
+  - Added the "adjustments/specialcases/corrections/i need to fix all this code it's an ugly bodge" json to fix Riot's lack of information on attack speed ratios and shit
   - Didn't actually fully finish the corrections json so some champs attack speed will be off
   - Fixed the attack speed calculation
+  - Genuinely some of the worst code I have ever wrote, and I will likely do a full rewrite of this stuff but hey at least we get Senna's attack speed at level 18 correct to 2 decimal places and actually expose the attack speed ratio stats
 
 - 0.1.1 - Added readme
 - 0.1.0 - Initial release

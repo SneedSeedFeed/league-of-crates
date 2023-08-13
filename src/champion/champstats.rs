@@ -61,10 +61,10 @@ impl ChampStats {
         Ok(LevelStats {
             hp: self.hp + self.hpperlevel * (level - 1) as f32,
             mp: self.mp + self.mpperlevel * (level - 1) as f32,
-            movespeed: self.movespeed,
+            movespeed: self.movespeed + ((level-1) as f32*self.movespeedperlevel),
             armor: self.armor + self.armorperlevel * (level - 1) as f32,
             spellblock: self.spellblock + self.spellblockperlevel * (level - 1) as f32,
-            attackrange: self.attackrange,
+            attackrange: self.attackrange + ((level-1) as f32*self.attackrangeperlevel),
             hpregen: self.hpregen + self.hpregenperlevel * (level - 1) as f32,
             mpregen: self.mpregen + self.mpregenperlevel * (level - 1) as f32,
             crit: self.crit + self.critperlevel * (level - 1) as f32,
