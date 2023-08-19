@@ -1,3 +1,5 @@
+mod champion;
+
 #[cfg(test)]
 mod tests {
     #[test]
