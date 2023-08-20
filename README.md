@@ -24,6 +24,9 @@ Todo:
   - Proper docs
 
 ## Changelog
+- 0.3.5
+  - Another cargo.toml update. I wish there was a cheat sheet to everything I can put in here.
+
 - 0.3.4 - Added keywords and repo to the cargo.toml, in case you want to see my horrendous code.
 
 - 0.3.3 - Pinned Serde version to 1.0.171, because of the precompiled binaries fiasco. Won't matter most likely.
