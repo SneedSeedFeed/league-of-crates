@@ -1,10 +1,12 @@
 [package]
 name = "league-of-crates"
-version = "0.3.3"
+version = "0.3.4"
 edition = "2021"
 exclude = [".idea/"]
 description = "Beginner project for learning rust. Parses league of legends .json data from DataDragon into Rust"
 license = "MIT"
+keywords = ["league-of-legends", "cdragon", "league"]
+repository = "https://github.com/SneedSeedFeed/league-of-crates"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
