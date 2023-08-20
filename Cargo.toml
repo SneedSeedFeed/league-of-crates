@@ -1,6 +1,6 @@
 [package]
 name = "league-of-crates"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2021"
 exclude = [".idea/"]
 description = "Beginner project for learning rust. Parses league of legends .json data from DataDragon into Rust"
@@ -11,6 +11,6 @@ license = "MIT"
 [dependencies]
 approx = "0.5.1"
 reqwest = { version = "0.11.18", features = ["json", "serde_json"] }
-serde = {version = "1.0.178", features = ["derive"]}
+serde = {version = "=1.0.171", features = ["derive"]}
 serde_json = "1.0.104"
 tokio = {version="1.31.0", features = ["full"]}

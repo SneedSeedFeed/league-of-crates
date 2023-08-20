@@ -24,6 +24,8 @@ Todo:
   - Proper docs
 
 ## Changelog
+- 0.3.3 - Pinned Serde version to 1.0.171, because of the precompiled binaries fiasco. Won't matter most likely.
+
 - 0.3.2 - Derived Clone and PartialEq because I forgor that rust won't allow you to do that if you use this crate
 
 - 0.3.1 - Updated readme
