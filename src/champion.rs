@@ -4,7 +4,7 @@ use serde_json::Value;
 use std::error;
 use std::fmt::{Display, Formatter};
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(default)]
 pub struct GameData {
     #[serde(rename = "mCharacterName")]
@@ -71,34 +71,45 @@ pub struct GameData {
     pub selection_radius: f32,
 }
 
-impl GameData{
-    pub fn get_stats_level(&self, level:u32) -> Result<LevelStats, ChampStatError>{
-        if level==0{
-            return Err(ChampStatError::ZeroError)
+impl GameData {
+    pub fn get_stats_level(&self, level: u32) -> Result<LevelStats, ChampStatError> {
+        if level == 0 {
+            return Err(ChampStatError::ZeroError);
         }
 
-        Ok(LevelStats{
-            hp:  self.base_hp + self.hp_per_level * (level - 1) as f32,
+        Ok(LevelStats {
+            hp: self.base_hp + self.hp_per_level * (level - 1) as f32,
             move_speed: self.base_move_speed,
-            armor: self.base_armor + self.armor_per_level * (level-1) as f32,
-            magic_resist: self.base_magic_resist + self.magic_resist_per_level * (level-1) as f32,
+            armor: self.base_armor + self.armor_per_level * (level - 1) as f32,
+            magic_resist: self.base_magic_resist + self.magic_resist_per_level * (level - 1) as f32,
             attack_range: self.base_attack_range,
-            hp_regen: self.base_hp_regen + self.hp_regen_per_level * (level-1) as f32,
-            attack_damage: self.base_attack_damage + self.attack_damage_per_level * (level-1) as f32,
-            attack_speed: self.base_attack_speed + self.attack_speed_ratio*(self.attack_speed_per_level*0.01*(level-1) as f32),
-            primary_resource_base: self.primary_ability_resource.base + self.primary_ability_resource.per_level * (level-1) as f32,
-            primary_resource_regen: self.primary_ability_resource.base_regen + self.primary_ability_resource.regen_per_level * (level-1) as f32,
-            secondary_resource_base: self.secondary_ability_resource.base + self.secondary_ability_resource.per_level * (level-1) as f32,
-            secondary_resource_regen: self.secondary_ability_resource.base_regen + self.secondary_ability_resource.regen_per_level * (level -1) as f32,
+            hp_regen: self.base_hp_regen + self.hp_regen_per_level * (level - 1) as f32,
+            attack_damage: self.base_attack_damage
+                + self.attack_damage_per_level * (level - 1) as f32,
+            attack_speed: self.base_attack_speed
+                + self.attack_speed_ratio
+                    * (self.attack_speed_per_level * 0.01 * (level - 1) as f32),
+            primary_resource_base: self.primary_ability_resource.base
+                + self.primary_ability_resource.per_level * (level - 1) as f32,
+            primary_resource_regen: self.primary_ability_resource.base_regen
+                + self.primary_ability_resource.regen_per_level * (level - 1) as f32,
+            secondary_resource_base: self.secondary_ability_resource.base
+                + self.secondary_ability_resource.per_level * (level - 1) as f32,
+            secondary_resource_regen: self.secondary_ability_resource.base_regen
+                + self.secondary_ability_resource.regen_per_level * (level - 1) as f32,
         })
     }
 
-    pub fn get_stats_range(&self, start:u32, stop:u32) -> Result<Vec<LevelStats>, ChampStatError>{
-        if start>=stop{
-            return Err(ChampStatError::LevelRangeError)
+    pub fn get_stats_range(
+        &self,
+        start: u32,
+        stop: u32,
+    ) -> Result<Vec<LevelStats>, ChampStatError> {
+        if start >= stop {
+            return Err(ChampStatError::LevelRangeError);
         }
         if start == 0 {
-            return Err(ChampStatError::ZeroError)
+            return Err(ChampStatError::ZeroError);
         }
         Ok((start..stop)
             .into_iter()
@@ -135,7 +146,7 @@ impl Default for GameData {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(default)]
 pub struct AbilityResource {
     #[serde(rename = "arIncrements")]
@@ -222,7 +233,7 @@ impl Default for AbilityResource {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(from = "i32")]
 pub enum ResourceType {
     Wind,
@@ -265,7 +276,7 @@ impl From<i32> for ResourceType {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(from = "String")]
 pub enum Roles {
     Tank,
@@ -291,7 +302,7 @@ impl From<String> for Roles {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 pub struct Champion {
     pub id: i32,
     pub name: String,
@@ -339,7 +350,11 @@ impl Champion {
         }
     }
 
-    pub fn get_stats_range(&self, start:u32, stop:u32) -> Result<Vec<LevelStats>, ChampStatError>{
+    pub fn get_stats_range(
+        &self,
+        start: u32,
+        stop: u32,
+    ) -> Result<Vec<LevelStats>, ChampStatError> {
         if self.stats.is_some() {
             Ok(self.stats.as_ref().unwrap().get_stats_range(start, stop)?)
         } else {
@@ -348,8 +363,8 @@ impl Champion {
     }
 
     pub fn get_effective_hp_at_level(&self, level: u32) -> Result<EffectiveHealth, ChampStatError> {
-        if level==0 {
-            return Err(ChampStatError::ZeroError)
+        if level == 0 {
+            return Err(ChampStatError::ZeroError);
         }
         Ok(self.get_stats_level(level)?.get_effective_health())
     }
@@ -359,12 +374,14 @@ impl Champion {
         min_level: u32,
         max_level: u32,
     ) -> Result<Vec<EffectiveHealth>, ChampStatError> {
-        if self.stats.is_none(){
-            return Err(ChampStatError::StatsNotLoaded)
+        if self.stats.is_none() {
+            return Err(ChampStatError::StatsNotLoaded);
         }
 
         Ok(self
-            .stats.as_ref().unwrap()
+            .stats
+            .as_ref()
+            .unwrap()
             .get_stats_range(min_level, max_level)?
             .iter()
             .map(|x| x.get_effective_health())
@@ -372,7 +389,7 @@ impl Champion {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ChampStatError {
     ZeroError,
     LevelRangeError,
@@ -416,7 +433,7 @@ pub struct EffectiveHealth {
     pub magical: f32,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize, Debug, Clone, PartialEq)]
 #[serde(transparent)]
 pub struct ChampDir {
     pub champions: Vec<Champion>,

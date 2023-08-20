@@ -1,21 +1,21 @@
 mod champion;
 
-macro_rules! new_dir_wrapped{
-    ()=>{
+macro_rules! new_dir_wrapped {
+    () => {
         ChampDir::from_cdragon().await
-    }
+    };
 }
 
-macro_rules! new_dir{
-    ()=>{
+macro_rules! new_dir {
+    () => {
         ChampDir::from_cdragon().await?
-    }
+    };
 }
 
 #[cfg(test)]
 mod tests {
-    use approx::assert_relative_eq;
     use crate::champion::ChampDir;
+    use approx::assert_relative_eq;
 
     #[tokio::test]
     async fn it_works() {
@@ -24,9 +24,9 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn has_num_champs() -> Result<(), Box<dyn std::error::Error>>{
+    async fn has_num_champs() -> Result<(), Box<dyn std::error::Error>> {
         let champ_dir = new_dir!();
-        assert_eq!(champ_dir.champions.len(),164);
+        assert_eq!(champ_dir.champions.len(), 164);
         Ok(())
     }
 
@@ -41,12 +41,14 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn get_name_ok() -> Result<(), Box<dyn std::error::Error>>  {
+    async fn get_name_ok() -> Result<(), Box<dyn std::error::Error>> {
         let champ_dir = new_dir!();
         let champ = champ_dir.get_by_name("Ornn".to_string());
         assert!(champ.is_some());
         assert_eq!(champ.unwrap().name, "Ornn".to_string());
-        assert!(champ_dir.get_by_name("Crystal Maiden".to_string()).is_none());
+        assert!(champ_dir
+            .get_by_name("Crystal Maiden".to_string())
+            .is_none());
         Ok(())
     }
 
@@ -54,7 +56,7 @@ mod tests {
     async fn calcs_ok() -> Result<(), Box<dyn std::error::Error>> {
         let mut champ_dir = new_dir!();
 
-        for champ in champ_dir.champions.iter_mut(){
+        for champ in champ_dir.champions.iter_mut() {
             if champ.name == "Ahri".to_string() || champ.name == "Senna".to_string() {
                 champ.populate_gamedata().await?;
             }

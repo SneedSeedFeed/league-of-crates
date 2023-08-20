@@ -24,6 +24,8 @@ Todo:
   - Proper docs
 
 ## Changelog
+- 0.3.2 - Derived Clone and PartialEq because I forgor that rust won't allow you to do that if you use this crate
+
 - 0.3.1 - Updated readme
 
 - 0.3.0
