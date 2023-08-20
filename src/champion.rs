@@ -1,70 +1,110 @@
-use serde::Deserialize;
+use serde::de::{MapAccess, SeqAccess};
+use serde::{Deserialize, Deserializer};
+use serde_json::Value;
+use std::error;
+use std::fmt::{Display, Formatter};
 
 #[derive(Deserialize, Debug)]
 #[serde(default)]
-struct GameData {
-    #[serde(rename = "primaryAbilityResource")]
-    primary_ability_resource: AbilityResource,
-
-    #[serde(rename = "secondaryAbilityResource")]
-    secondary_ability_resource: AbilityResource,
-
+pub struct GameData {
     #[serde(rename = "mCharacterName")]
-    name: String,
+    pub name: String,
 
     #[serde(rename = "baseHP")]
-    base_hp: f32,
+    pub base_hp: f32,
 
     #[serde(rename = "hpPerLevel")]
-    hp_per_level: f32,
+    pub hp_per_level: f32,
 
     #[serde(rename = "baseStaticHPRegen")]
-    base_hp_regen: f32,
+    pub base_hp_regen: f32,
 
     #[serde(rename = "hpRegenPerLevel")]
-    hp_regen_per_level: f32,
+    pub hp_regen_per_level: f32,
 
     #[serde(rename = "baseDamage")]
-    base_attack_damage: f32,
+    pub base_attack_damage: f32,
 
     #[serde(rename = "damagePerLevel")]
-    attack_damage_per_level: f32,
+    pub attack_damage_per_level: f32,
 
     #[serde(rename = "baseArmor")]
-    base_armor: f32,
+    pub base_armor: f32,
 
     #[serde(rename = "armorPerLevel")]
-    armor_per_level: f32,
+    pub armor_per_level: f32,
 
     #[serde(rename = "baseSpellBlock")]
-    base_magic_resist: f32,
+    pub base_magic_resist: f32,
 
     #[serde(rename = "spellBlockPerLevel")]
-    magic_resist_per_level: f32,
+    pub magic_resist_per_level: f32,
 
     #[serde(rename = "baseMoveSpeed")]
-    base_move_speed: f32,
+    pub base_move_speed: f32,
 
     #[serde(rename = "attackRange")]
-    base_attack_range: f32,
+    pub base_attack_range: f32,
 
     #[serde(rename = "attackSpeed")]
-    base_attack_speed: f32,
+    pub base_attack_speed: f32,
 
     #[serde(rename = "attackSpeedRatio")]
-    attack_speed_ratio: f32,
+    pub attack_speed_ratio: f32,
 
     #[serde(rename = "attackSpeedPerLevel")]
-    attack_speed_per_level: f32,
+    pub attack_speed_per_level: f32,
+
+    #[serde(rename = "primaryAbilityResource")]
+    pub primary_ability_resource: AbilityResource,
+
+    #[serde(rename = "secondaryAbilityResource")]
+    pub secondary_ability_resource: AbilityResource,
 
     #[serde(rename = "acquisitionRange")]
-    acquisition_range: f32,
+    pub acquisition_range: f32,
 
     #[serde(rename = "selectionHeight")]
-    selection_height: f32,
+    pub selection_height: f32,
 
     #[serde(rename = "selectionRadius")]
-    selection_radius: f32,
+    pub selection_radius: f32,
+}
+
+impl GameData{
+    pub fn get_stats_level(&self, level:u32) -> Result<LevelStats, ChampStatError>{
+        if level==0{
+            return Err(ChampStatError::ZeroError)
+        }
+
+        Ok(LevelStats{
+            hp:  self.base_hp + self.hp_per_level * (level - 1) as f32,
+            move_speed: self.base_move_speed,
+            armor: self.base_armor + self.armor_per_level * (level-1) as f32,
+            magic_resist: self.base_magic_resist + self.magic_resist_per_level * (level-1) as f32,
+            attack_range: self.base_attack_range,
+            hp_regen: self.base_hp_regen + self.hp_regen_per_level * (level-1) as f32,
+            attack_damage: self.base_attack_damage + self.attack_damage_per_level * (level-1) as f32,
+            attack_speed: self.base_attack_speed + self.attack_speed_ratio*(self.attack_speed_per_level*0.01*(level-1) as f32),
+            primary_resource_base: self.primary_ability_resource.base + self.primary_ability_resource.per_level * (level-1) as f32,
+            primary_resource_regen: self.primary_ability_resource.base_regen + self.primary_ability_resource.regen_per_level * (level-1) as f32,
+            secondary_resource_base: self.secondary_ability_resource.base + self.secondary_ability_resource.per_level * (level-1) as f32,
+            secondary_resource_regen: self.secondary_ability_resource.base_regen + self.secondary_ability_resource.regen_per_level * (level -1) as f32,
+        })
+    }
+
+    pub fn get_stats_range(&self, start:u32, stop:u32) -> Result<Vec<LevelStats>, ChampStatError>{
+        if start>=stop{
+            return Err(ChampStatError::LevelRangeError)
+        }
+        if start == 0 {
+            return Err(ChampStatError::ZeroError)
+        }
+        Ok((start..stop)
+            .into_iter()
+            .map(|i| self.get_stats_level(i).unwrap())
+            .collect())
+    }
 }
 
 impl Default for GameData {
@@ -97,63 +137,63 @@ impl Default for GameData {
 
 #[derive(Debug, Deserialize)]
 #[serde(default)]
-struct AbilityResource {
+pub struct AbilityResource {
     #[serde(rename = "arIncrements")]
-    increments: f32,
+    pub increments: f32,
 
     #[serde(rename = "arBaseStaticRegen")]
-    base_regen: f32,
+    pub base_regen: f32,
 
     #[serde(rename = "arIsShown")]
-    is_shown: bool,
+    pub is_shown: bool,
 
     #[serde(rename = "HideEmptyPips")]
-    hide_empty_pips: bool,
+    pub hide_empty_pips: bool,
 
     #[serde(rename = "arNegativeSpacer")]
-    negative_spacer: bool,
+    pub negative_spacer: bool,
 
     #[serde(rename = "arOverrideEmptyPipName")]
-    override_empty_pip_name: String,
+    pub override_empty_pip_name: String,
 
     #[serde(rename = "arHasRegenText")]
-    has_regen_text: bool,
+    pub has_regen_text: bool,
 
     #[serde(rename = "arAllowMaxValueToBeOverridden")]
-    allow_max_value_to_be_overridden: bool,
+    pub allow_max_value_to_be_overridden: bool,
 
     #[serde(rename = "arDisplayAsPips")]
-    display_as_pips: bool,
+    pub display_as_pips: bool,
 
     #[serde(rename = "asOverrideMediumPipName")]
-    override_medium_pip_name: String,
+    pub override_medium_pip_name: String,
 
     #[serde(rename = "arBase")]
-    base: f32,
+    pub base: f32,
 
     #[serde(rename = "arOverrideSpacerName")]
-    override_spacer_name: String,
+    pub override_spacer_name: String,
 
     #[serde(rename = "arType")]
-    resource_type: ResourceType,
+    pub resource_type: ResourceType,
 
     #[serde(rename = "arMaxSegments")]
-    max_segments: i32,
+    pub max_segments: i32,
 
     #[serde(rename = "arOverrideLargePipName")]
-    override_large_pip_name: String,
+    pub override_large_pip_name: String,
 
     #[serde(rename = "arIsShownOnlyOnLocalPlayer")]
-    is_shown_only_on_local_player: bool,
+    pub is_shown_only_on_local_player: bool,
 
     #[serde(rename = "arOverrideSmallPipName")]
-    override_small_pip_name: String,
+    pub override_small_pip_name: String,
 
     #[serde(rename = "arPerLevel")]
-    per_level: f32,
+    pub per_level: f32,
 
     #[serde(rename = "arRegenPerLevel")]
-    regen_per_level: f32,
+    pub regen_per_level: f32,
 }
 
 impl Default for AbilityResource {
@@ -184,7 +224,7 @@ impl Default for AbilityResource {
 
 #[derive(Debug, Deserialize)]
 #[serde(from = "i32")]
-enum ResourceType {
+pub enum ResourceType {
     Wind,
     Heat,
     Energy,
@@ -225,6 +265,186 @@ impl From<i32> for ResourceType {
     }
 }
 
-struct Champion{
-    stats: GameData
+#[derive(Deserialize, Debug)]
+#[serde(from = "String")]
+pub enum Roles {
+    Tank,
+    Assassin,
+    Marksman,
+    Mage,
+    Support,
+    Fighter,
+    Other(String),
+}
+
+impl From<String> for Roles {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "tank" => Roles::Tank,
+            "assassin" => Roles::Assassin,
+            "marksman" => Roles::Marksman,
+            "mage" => Roles::Mage,
+            "support" => Roles::Support,
+            "fighter" => Roles::Fighter,
+            _ => Roles::Other(value),
+        }
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Champion {
+    pub id: i32,
+    pub name: String,
+    pub alias: String,
+    pub roles: Vec<Roles>,
+
+    #[serde(skip)]
+    pub stats: Option<GameData>,
+}
+
+impl Champion {
+    pub async fn populate_gamedata(&mut self) -> Result<(), Box<dyn error::Error>> {
+        if self.id == -1 || self.stats.is_some() {
+            return Ok(());
+        }
+
+        const CHAMP_LOC: &str =
+            "https://raw.communitydragon.org/latest/game/data/characters/{}/{}.bin.json";
+
+        let request = reqwest::get(CHAMP_LOC.replace("{}", self.alias.to_lowercase().as_str()))
+            .await?
+            .json::<Value>()
+            .await?;
+
+        let character_records = request
+            .as_object()
+            .expect("Champ json is not object")
+            .get(
+                "Characters/{}/CharacterRecords/Root"
+                    .replace("{}", self.alias.as_str())
+                    .as_str(),
+            )
+            .expect("Champ json has no CharacterRecords");
+
+        self.stats = Some(serde_json::from_value(character_records.to_owned())?);
+
+        Ok(())
+    }
+
+    pub fn get_stats_level(&self, level: u32) -> Result<LevelStats, ChampStatError> {
+        if self.stats.is_some() {
+            Ok(self.stats.as_ref().unwrap().get_stats_level(level)?)
+        } else {
+            Err(ChampStatError::StatsNotLoaded)
+        }
+    }
+
+    pub fn get_stats_range(&self, start:u32, stop:u32) -> Result<Vec<LevelStats>, ChampStatError>{
+        if self.stats.is_some() {
+            Ok(self.stats.as_ref().unwrap().get_stats_range(start, stop)?)
+        } else {
+            Err(ChampStatError::StatsNotLoaded)
+        }
+    }
+
+    pub fn get_effective_hp_at_level(&self, level: u32) -> Result<EffectiveHealth, ChampStatError> {
+        if level==0 {
+            return Err(ChampStatError::ZeroError)
+        }
+        Ok(self.get_stats_level(level)?.get_effective_health())
+    }
+
+    pub fn get_effective_hp_range(
+        &self,
+        min_level: u32,
+        max_level: u32,
+    ) -> Result<Vec<EffectiveHealth>, ChampStatError> {
+        if self.stats.is_none(){
+            return Err(ChampStatError::StatsNotLoaded)
+        }
+
+        Ok(self
+            .stats.as_ref().unwrap()
+            .get_stats_range(min_level, max_level)?
+            .iter()
+            .map(|x| x.get_effective_health())
+            .collect())
+    }
+}
+
+#[derive(Debug)]
+pub enum ChampStatError {
+    ZeroError,
+    LevelRangeError,
+    StatsNotLoaded,
+}
+
+impl Display for ChampStatError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Stat calculation error occurred")
+    }
+}
+
+impl error::Error for ChampStatError {}
+
+pub struct LevelStats {
+    pub hp: f32,
+    pub move_speed: f32,
+    pub armor: f32,
+    pub magic_resist: f32,
+    pub attack_range: f32,
+    pub hp_regen: f32,
+    pub attack_damage: f32,
+    pub attack_speed: f32,
+    pub primary_resource_base: f32,
+    pub primary_resource_regen: f32,
+    pub secondary_resource_base: f32,
+    pub secondary_resource_regen: f32,
+}
+
+impl LevelStats {
+    pub fn get_effective_health(&self) -> EffectiveHealth {
+        EffectiveHealth {
+            physical: self.hp * (1f32 + 0.01 * self.armor),
+            magical: self.hp * (1f32 + 0.01 * self.magic_resist),
+        }
+    }
+}
+
+pub struct EffectiveHealth {
+    pub physical: f32,
+    pub magical: f32,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(transparent)]
+pub struct ChampDir {
+    pub champions: Vec<Champion>,
+}
+
+impl ChampDir {
+    pub async fn from_cdragon() -> Result<ChampDir, Box<dyn error::Error>> {
+        let res = reqwest::get(
+            "https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-summary.json",
+        )
+            .await?
+            .json::<Value>()
+            .await?;
+
+        let mut dir = serde_json::from_value::<ChampDir>(res)?;
+
+        // Removing the None champ
+        dir.champions.remove(0);
+
+        Ok(dir)
+    }
+    pub fn get_by_name(&self, name: String) -> Option<&Champion> {
+        self.champions.iter().find(|x| x.name == name)
+    }
+    pub fn get_by_alias(&self, alias: String) -> Option<&Champion> {
+        self.champions.iter().find(|x| x.alias == alias)
+    }
+    pub fn get_by_key(&self, id: i32) -> Option<&Champion> {
+        self.champions.iter().find(|x| x.id == id)
+    }
 }
