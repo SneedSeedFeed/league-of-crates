@@ -23,6 +23,11 @@ Todo:
   - Allow pulling from a specific version
   - Proper docs
 
+## A note on ability resources and the structures in general
+Originally when I was reworking 0.2 with the CDragon data (so it didn't suck as bad) AKA version 0.3, I mapped out the different resource types and worked out what fields were necessary. I then wrote my own deserializer that would return the right primary or secondary resource enum with a specific struct wrapped up in the enum that had the fields I deemed necessary. You may notice this is not the case, and that the only enum is for the resource type AND that primary and secondary resource types share the same structure. This decision is done to match CDragon's files as closely as possible.
+
+This comes with a quirk, that quirk is that any fields that aren't filled in their data come from a set of defaults which I've mirrored in my code. So yes Vex's anti-dash resource shares from Shyvana's Dragon Fury and a bunch of fields might initially look nonsensical but to my understanding this is the same nonsense that Riot games have. If this gets overcomplicated, it may change in future but while this is just basic stat calculation I think we're fine.
+
 ## Changelog
 - 0.3.5
   - Another cargo.toml update. I wish there was a cheat sheet to everything I can put in here.
